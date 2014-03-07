@@ -14,9 +14,14 @@
 	#chatInput {
 		border: 2px solid silver;
 		border-radius: 4px;
-		width: 354px;
+		width: 358px;
 		font-size: 1.1em;
 		padding: 3px;
+	}
+
+	#userCount {
+		font-size: 12px;
+		margin-top: 5px;
 	}
 </style>
 
@@ -24,6 +29,9 @@
 </div>
 
 <input type="text" id="chatInput" placeholder="Type a message and press enter to send!">
+
+<div id="userCount">
+</div>
 
 <script>
 	$(document).ready(function() {
@@ -57,6 +65,11 @@
   		+ escapeHtml(data.msg) + "<br>");
 
   	$("#chatBox")[0].scrollTop = 9999999;
+  });
+
+  socket.on('new_user', function (data) {
+  	$("#userCount").text("Connected users: "
+  	 + data.count);
   });
 
   function sendMessage() {

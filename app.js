@@ -24,9 +24,14 @@ function genRandomUserName() {
   return "trader_" + name.substr(0, 3);
 }
 
+user_count = 0;
+
 // Actual WebSockets stuff starts here
 io.sockets.on('connection', function (socket) {
   socket.emit('server_message', { msg: 'Welcome to our chat!' });
+
+  user_count += 1;
+  console.log(user_count);
 
   var user = {};
   user.name = genRandomUserName();
@@ -34,9 +39,16 @@ io.sockets.on('connection', function (socket) {
   user.last_message = new Date().getTime();
   socket.set('user_data', user);
 
+  socket.broadcast.emit('new_user', { count: user_count });
+  socket.emit('new_user', { count: user_count });
   socket.emit('server_message', { msg: 'You are speaking as: ' + user.name });
 
 // Events
+  socket.on('disconnect', function() { 
+    user_count -= 1;
+    socket.broadcast.emit('new_user', { count: user_count });
+  });
+
   socket.on('send_message', function (data) {
     socket.get('user_data', function(err, user) {
       var time = new Date().getTime();
