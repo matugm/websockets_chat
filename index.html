@@ -1,0 +1,56 @@
+<script src="/socket.io/socket.io.js"></script>
+<script src="\\code.jquery.com/jquery.js"></script>
+
+<style type="text/css">
+	#chatBox {
+		border: 2px solid silver;
+		border-radius: 4px;
+		height: 300px;
+		width: 30%;
+	}
+
+	#chatInput {
+		border: 2px solid #7575A3;
+		border-radius: 4px;
+		width: 30.3%;
+		font-size: 1.1em;
+	}
+</style>
+
+<div id="chatBox">
+</div>
+
+<input type="text" id="chatInput" placeholder="Type a message and press enter to send!">
+
+<script>
+	document.getElementById("chatInput").addEventListener("keydown", function(e) {
+	    if (!e) { var e = window.event; }
+
+	    // Enter key is pressed
+	    if (e.keyCode == 13) { sendMessage(); }
+	}, false);
+
+  var socket = io.connect('http://localhost');
+
+  socket.on('server_message', function (data) {
+    $("#chatBox").append("[Server] " + data.msg + "<br>");
+  });
+
+  socket.on('user_message', function (data) {
+  	$("#chatBox").append(data.user + ": " + data.msg + "<br>");
+  });
+
+  function sendMessage() {
+  	var data = $("#chatInput")[0].value;
+	$("#chatInput")[0].value = "";
+
+  	socket.emit('send_message', { msg: data });
+  	addOwnMessage(data);
+  }
+
+  function addOwnMessage(data) {
+  	$("#chatBox").append("You: " + data + "<br>");
+  }
+
+</script>
+
