@@ -1,4 +1,4 @@
-<script src="/socket.io/socket.io.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
 <script src="//code.jquery.com/jquery.js"></script>
 
 <style type="text/css">
@@ -11,7 +11,7 @@
 	}
 
 	#chatInput {
-		border: 2px solid #7575A3;
+		border: 2px solid silver;
 		border-radius: 4px;
 		width: 354px;
 		font-size: 1.1em;
@@ -24,6 +24,10 @@
 <input type="text" id="chatInput" placeholder="Type a message and press enter to send!">
 
 <script>
+	$(document).ready(function() {
+		$("#chatInput").focus();
+	});
+
 	function escapeHtml(text) {
   	  return text
       	.replace(/&/g, "&amp;")
