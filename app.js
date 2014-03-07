@@ -28,15 +28,37 @@ function genRandomUserName() {
 io.sockets.on('connection', function (socket) {
   socket.emit('server_message', { msg: 'Welcome to our chat!' });
 
-  var name = genRandomUserName();
-  socket.set('user_name', name);
+  var user = {};
+  user.name = genRandomUserName();
+  user.msg_count = 0;
+  user.last_message = new Date().getTime();
+  socket.set('user_data', user);
 
-  socket.emit('server_message', { msg: 'You are speaking as: ' + name })
+  socket.emit('server_message', { msg: 'You are speaking as: ' + user.name });
 
 // Events
   socket.on('send_message', function (data) {
-    socket.get('user_name', function(err, name) {
-      socket.broadcast.emit('user_message', { msg: data.msg, user: name });
+    socket.get('user_data', function(err, user) {
+      var time = new Date().getTime();
+      var diff = time - user.last_message;
+
+      if (diff < 8000) {
+        if (user.msg_count >= 3) {
+          socket.emit('server_message', { msg: 'You are sending messages '
+            + 'too fast. Please slow down.'} );
+
+          return false;
+        }
+      }
+      else {
+        user.last_message = time;
+        user.msg_count = 0;
+      }
+
+      user.msg_count   += 1;
+      socket.set('user_data', user);
+
+      socket.broadcast.emit('user_message', { msg: data.msg, user: user.name });
     });
   });
 

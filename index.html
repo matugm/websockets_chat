@@ -6,14 +6,14 @@
 		border: 2px solid silver;
 		border-radius: 4px;
 		height: 300px;
-		width: 30%;
+		width: 350px;
 		overflow: auto;
 	}
 
 	#chatInput {
 		border: 2px solid #7575A3;
 		border-radius: 4px;
-		width: 30.3%;
+		width: 354px;
 		font-size: 1.1em;
 	}
 </style>
@@ -40,7 +40,7 @@
 	    if (e.keyCode == 13) { sendMessage(); }
 	}, false);
 
-  var socket = io.connect('http://localhost');
+  var socket = io.connect('http://192.168.1.28');
 
   socket.on('server_message', function (data) {
     $("#chatBox").append("[Server] " + data.msg + "<br>");
