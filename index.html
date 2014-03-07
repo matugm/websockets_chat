@@ -8,6 +8,7 @@
 		height: 300px;
 		width: 350px;
 		overflow: auto;
+		padding: 3px;
 	}
 
 	#chatInput {
@@ -15,6 +16,7 @@
 		border-radius: 4px;
 		width: 354px;
 		font-size: 1.1em;
+		padding: 3px;
 	}
 </style>
 
@@ -51,10 +53,10 @@
   });
 
   socket.on('user_message', function (data) {
-  	$("#chatBox").append(data.user
-  		+ ": "
-  		+ escapeHtml(data.msg)
-  		+ "<br>");
+  	$("#chatBox").append(data.user + ": "
+  		+ escapeHtml(data.msg) + "<br>");
+
+  	$("#chatBox")[0].scrollTop = 9999999;
   });
 
   function sendMessage() {
@@ -67,8 +69,9 @@
 
   function addOwnMessage(data) {
   	$("#chatBox").append("You: "
-  		+ escapeHtml(data)
-  		+ "<br>");
+  		+ escapeHtml(data) + "<br>");
+
+  	$("#chatBox")[0].scrollTop = 9999999;
   }
 
 </script>
