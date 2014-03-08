@@ -47,11 +47,16 @@
       	.replace(/'/g, "&#039;");
 	}
 
+	function isAdminCmd(str) {
+		return str.split(" ")[0].charAt(0) == "/";
+	}
+
 	document.getElementById("chatInput").addEventListener("keydown", function(e) {
 	    if (!e) { var e = window.event; }
 
 	    // Enter key is pressed
-	    if (e.keyCode == 13) { sendMessage(); }
+	    if (e.keyCode == 13) { sendMessage(); 
+	    }
 	}, false);
 
   var socket = io.connect('http://localhost:8020');
@@ -76,15 +81,19 @@
   	var data = $("#chatInput")[0].value;
 	$("#chatInput")[0].value = "";
 
-  	socket.emit('send_message', { msg: data });
-  	addOwnMessage(data);
+	if (isAdminCmd(data)) {
+		socket.emit('admin_cmd', { msg: data });
+	} else {
+	  	socket.emit('send_message', { msg: data });
+	  	addOwnMessage(data);
+	}
   }
 
   function addOwnMessage(data) {
   	$("#chatBox").append("You: "
   		+ escapeHtml(data) + "<br>");
 
-  	$("#chatBox")[0].scrollTop = 9999999;
+  	$("#chatBox")[0].scrollTop = 99999999;
   }
 
 </script>
