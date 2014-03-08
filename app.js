@@ -115,7 +115,7 @@ io.sockets.on('connection', function (socket) {
       user.msg_count += 1;
       socket.set('user_data', user);
 
-      socket.broadcast.emit('user_message', { msg: data.msg, user: user.name });
+      socket.broadcast.emit('user_message', { msg: data.msg, user: user.name, admin: user.admin });
     });
   });
 

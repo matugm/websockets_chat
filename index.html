@@ -66,6 +66,9 @@
   });
 
   socket.on('user_message', function (data) {
+  	if (data.admin)
+  		data.user = "(admin) " + data.user;
+
   	$("#chatBox").append(data.user + ": "
   		+ escapeHtml(data.msg) + "<br>");
 
@@ -90,7 +93,7 @@
   }
 
   function addOwnMessage(data) {
-  	$("#chatBox").append("You: "
+  	$("#chatBox").append("<strong>You: </strong>"
   		+ escapeHtml(data) + "<br>");
 
   	$("#chatBox")[0].scrollTop = 99999999;
