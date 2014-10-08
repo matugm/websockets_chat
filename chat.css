@@ -1,0 +1,25 @@
+body {
+	font-family: 'Verdana', 'Helvetica';
+}
+
+#chatBox {
+	border: 2px solid silver;
+	border-radius: 4px;
+	height: 300px;
+	width: 350px;
+	overflow: auto;
+	padding: 3px;
+}
+
+#chatInput {
+	border: 2px solid silver;
+	border-radius: 4px;
+	width: 358px;
+	font-size: 1.1em;
+	padding: 3px;
+}
+
+#userCount {
+	font-size: 12px;
+	margin-top: 5px;
+}

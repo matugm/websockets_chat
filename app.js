@@ -5,19 +5,33 @@ var app = require('http').createServer(handler)
   , shasum = crypto.createHash('sha1');
 
 app.listen(8020);
+io.set('log level', 1); // reduce logging
 
-// Read index.html and display it.
-function handler (req, res) {
-  fs.readFile(__dirname + '/index.html',
-  function (err, data) {
-    if (err) {
-      res.writeHead(500);
-      return res.end('Error loading index.html');
-    }
+function send_file(file_name, res) {
+  fs.readFile(__dirname + file_name,
+    function (err, data) {
+      if (err) {
+        res.writeHead(500);
+        return res.end('Error loading ' + file_name);
+      }
 
-    res.writeHead(200);
-    res.end(data);
+      res.writeHead(200);
+      res.end(data);
   });
+}
+
+// Web server (handle html / css).
+function handler (req, res) {
+  parsed_url = require('url').parse(req.url);
+  console.log("Request for: " + parsed_url.path + " >> Client: " + req.socket.remoteAddress);
+
+  if (parsed_url.path === '/') {
+    send_file('/index.html', res);
+  }
+
+  if (parsed_url.path === '/chat.css') {
+    send_file('/chat.css', res);
+  }
 }
 
 function genRandomUserName() {
