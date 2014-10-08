@@ -40,11 +40,11 @@
 
 	function escapeHtml(text) {
 		return text
-		  	.replace(/&/g, "&amp;")
-		  	.replace(/</g, "&lt;")
-		  	.replace(/>/g, "&gt;")
-		  	.replace(/"/g, "&quot;")
-		  	.replace(/'/g, "&#039;");
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#039;");
 	}
 
 	function isAdminCmd(str) {
@@ -53,27 +53,26 @@
 
 	function addMessageToChatBox(data) {
 		if (data.admin)
-  			data.user = "(admin) " + data.user;
+			data.user = "(admin) " + data.user;
 
-	  	$("#chatBox").append(data.user + ": "
-	  		+ escapeHtml(data.msg) + "<br>");
+  	$("#chatBox").append(data.user + ": "
+  		+ escapeHtml(data.msg) + "<br>");
 
-	  	$("#chatBox")[0].scrollTop = 9999999;
+  	$("#chatBox")[0].scrollTop = $("#chatBox")[0].scrollHeight;
 	}
 
 	document.getElementById("chatInput").addEventListener("keydown", function(e) {
 	    if (!e) { var e = window.event; }
 
 	    // Enter key is pressed
-	    if (e.keyCode == 13) { sendMessage(); 
-	    }
+	    if (e.keyCode == 13) { sendMessage(); }
 	}, false);
 
   var socket = io.connect('http://192.168.1.28:8020');
 
   socket.on('server_message', function (data) {
     $("#chatBox").append("[Server] " + data.msg + "<br>");
-    $("#chatBox")[0].scrollTop = 9999999;
+    $("#chatBox")[0].scrollTop = $("#chatBox")[0].scrollHeight;
   });
 
   socket.on('user_message', function (data) {
@@ -93,22 +92,21 @@
 
   function sendMessage() {
   	var data = $("#chatInput")[0].value;
-	$("#chatInput")[0].value = "";
+		$("#chatInput")[0].value = "";
 
-	if (isAdminCmd(data)) {
-		socket.emit('admin_cmd', { msg: data });
-	} else {
+		if (isAdminCmd(data)) {
+			socket.emit('admin_cmd', { msg: data });
+		} else {
 	  	socket.emit('send_message', { msg: data });
 	  	addOwnMessage(data);
-	}
+		}
   }
 
   function addOwnMessage(data) {
   	$("#chatBox").append("<strong>You: </strong>"
   		+ escapeHtml(data) + "<br>");
 
-  	$("#chatBox")[0].scrollTop = 99999999;
+  	$("#chatBox")[0].scrollTop = $("#chatBox")[0].scrollHeight;
   }
 
 </script>
-
