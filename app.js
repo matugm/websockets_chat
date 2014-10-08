@@ -23,7 +23,7 @@ function send_file(file_name, res) {
 // Web server (handle html / css).
 function handler (req, res) {
   parsed_url = require('url').parse(req.url);
-  console.log("Request for: " + parsed_url.path + " >> Client: " + req.socket.remoteAddress);
+  console.log("Request for: " + parsed_url.path + " [ Client: " + req.socket.remoteAddress + " ]");
 
   if (parsed_url.path === '/') {
     send_file('/index.html', res);

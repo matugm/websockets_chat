@@ -70,6 +70,10 @@
 
   var socket = io.connect('http://192.168.88.46:8020');
 
+  socket.on('disconnect', function () {
+  	$("#chatBox").append("[*] Disconnected from server.<br>");
+  });
+
   socket.on('server_message', function (data) {
     $("#chatBox").append("[Server] " + data.msg + "<br>");
     $("#chatBox")[0].scrollTop = $("#chatBox")[0].scrollHeight;
@@ -91,6 +95,12 @@
   });
 
   function sendMessage() {
+  	// Check connection status (socket.connected in 1.x)
+  	if (!socket.socket.connected) {
+  		$("#chatBox").append("[*] Couldn't send message: server is offline (try to reload your browser).<br>");
+  		return false;
+  	}
+
   	var data = $("#chatInput")[0].value;
 		$("#chatInput")[0].value = "";
 
