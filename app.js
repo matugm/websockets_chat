@@ -145,6 +145,7 @@ io.sockets.on('connection', function (socket) {
         return false;
       }
 
+      // Anti-spam check
       if (diff < 8000) {
         if (user.msg_count >= 3) {
           socket.emit('server_message', { msg: 'You are sending messages '
