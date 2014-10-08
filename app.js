@@ -1,6 +1,8 @@
 var app = require('http').createServer(handler)
   , io = require('socket.io').listen(app)
   , fs = require('fs')
+  , crypto = require('crypto')
+  , shasum = crypto.createHash('sha1');
 
 app.listen(8020);
 
@@ -24,8 +26,16 @@ function genRandomUserName() {
   return "trader_" + name.substr(0, 3);
 }
 
+function save_msg(msg) {
+  last_20.push(msg);
+
+  if (last_20.lenght >= 20)
+    last_20.shift();
+}
+
 user_count = 0;
 banned_users = [];
+last_20 = [];
 admin_pass = "92zn4tEU";
 
 // Actual WebSockets stuff starts here
@@ -44,6 +54,8 @@ io.sockets.on('connection', function (socket) {
   socket.broadcast.emit('new_user', { count: user_count });
   socket.emit('new_user', { count: user_count });
   socket.emit('server_message', { msg: 'You are speaking as: ' + user.name });
+
+  socket.emit('multi_msg', last_20);
 
 // Events
   socket.on('disconnect', function() { 
@@ -68,32 +80,66 @@ io.sockets.on('connection', function (socket) {
       }
 
       if (cmd == "/ban") {
-        banned_users.push(args);
+        banned_users.push({ name: args });
         socket.emit('server_message', { msg: args + " has been banned from chat."});
-      }      
+      }
 
       if (cmd == "/unban") {
-        var index = banned_users.indexOf(args);
+        var index = getBannedIndex(args);
 
-        if (index == -1) {
+        if (!index) {
           socket.emit('server_message', { msg: "User is not banned." });
           return;
         }
 
         banned_users.splice(index, index + 1);
-        console.log(index);
         socket.emit('server_message', { msg: args + " has been unbanned."});
       }
 
     });
   });
 
+  function isBanned(user) {
+    var ip = socket.handshake.address.address;
+
+    for (index in banned_users) {
+      var ban = banned_users[index];
+      if (ban.name == user || ban.ip == ip)
+        return true;
+    }
+
+    return false;
+  }
+
+  function getBannedIndex(user) {
+    for (index in banned_users) {
+      var ban = banned_users[index];
+
+      if (ban.name == user)
+        return index;
+    }
+
+    return false;
+  }
+
+  function setBannedIp(user) {
+    var ip = socket.handshake.address.address;
+
+    for (index in banned_users) {
+      var ban = banned_users[index];
+
+      if (ban.name == user)
+        return ban.ip = ip;
+    }
+  }
+
   socket.on('send_message', function (data) {
     socket.get('user_data', function(err, user) {
       var time = new Date().getTime();
       var diff = time - user.last_message;
 
-      if (banned_users.indexOf(user.name) > -1) {
+      if (isBanned(user.name)) {
+        setBannedIp(user.name);
         socket.emit('server_message', { msg: 'Sorry, you have been banned.'});
 
         return false;
@@ -115,7 +161,9 @@ io.sockets.on('connection', function (socket) {
       user.msg_count += 1;
       socket.set('user_data', user);
 
-      socket.broadcast.emit('user_message', { msg: data.msg, user: user.name, admin: user.admin });
+      var user_msg = { msg: data.msg, user: user.name, admin: user.admin };
+      save_msg(user_msg);
+      socket.broadcast.emit('user_message', user_msg);
     });
   });
 
